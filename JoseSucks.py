@@ -67,7 +67,7 @@ def main():
                 time.sleep(10)
             tweet = "Jose literally contributed nothing to his team on " + champjson['name'] + ".\nK/D/A: " + str(kills) + "/" + str(deaths) + "/" + str(assists)
             print(tweet)
-            #api.update_status(status=tweet)
+            api.update_status(status=tweet)
         else:
             if(not deaths ==0 and (kills+assists)/deaths < 1.0):
                 champjson = requests.get(CHAMPINFO + str(infojson['participants'][slotID]['championId']) + "?" + KEY).json()
@@ -78,6 +78,6 @@ def main():
                     time.sleep(10)
                 tweet = "Jose fed uncontrollably on " + champjson['name'] + ".\nK/D/A: " + str(kills) + "/" + str(deaths) + "/" + str(assists)
                 print(tweet)
-                #api.update_status(status=tweet)
-        #dumpPickle(matchTime)
+                api.update_status(status=tweet)
+        dumpPickle(matchTime)
 main()
