@@ -35,13 +35,22 @@ def dumpPickle(matchTime):
     with open('latesttime.pickle', 'wb') as f:
         pickle.dump(matchTime,f)
 
+def genTweet(baseTweet):
+    champjson = requests.get(CHAMPINFO + str(infojson['participants'][slotID]['championId']) + "?" + KEY).json()
+    requestsMade += 1
+    if(requestsMade > 9):
+        print('sleeping')
+        requestsMade = 0
+        time.sleep(10)
+    tweet = baseTweet + champjson['name'] + ".\nK/D/A: " + str(kills) + "/" + str(deaths) + "/" + str(assists)
+    return(tweet)
+
 def main():
     matchTime = loadPickle()
     r = requests.get(GETMATCHES + JOSEID + "?" + BEGINTIME + str(matchTime) + "&" + KEY)
     requestsMade = 1
     mjson = r.json()
     matchTime = mjson['matches'][0]['timestamp']
-    #dumpPickle(matchTime)
     for match in mjson['matches']:
         r2 = requests.get(GETMATCHINFO + str(match['matchId']) + "?" + KEY)
         requestsMade += 1
@@ -59,25 +68,10 @@ def main():
         deaths = infojson['participants'][slotID]['stats']['deaths']
         assists = infojson['participants'][slotID]['stats']['assists']
         if(kills+assists == 0):
-            champjson = requests.get(CHAMPINFO + str(infojson['participants'][slotID]['championId']) + "?" + KEY).json()
-            requestsMade += 1
-            if(requestsMade > 9):
-                print('sleeping')
-                requestsMade = 0
-                time.sleep(10)
-            tweet = "Jose literally contributed nothing to his team on " + champjson['name'] + ".\nK/D/A: " + str(kills) + "/" + str(deaths) + "/" + str(assists)
-            print(tweet)
+            tweet = genTweet("Jose literally contributed nothing to his team on ")
             api.update_status(status=tweet)
         else:
-            if(not deaths ==0 and (kills+assists)/deaths < 1.0):
-                champjson = requests.get(CHAMPINFO + str(infojson['participants'][slotID]['championId']) + "?" + KEY).json()
-                requestsMade += 1
-                if(requestsMade > 9):
-                    print('sleeping')
-                    requestsMade = 0
-                    time.sleep(10)
-                tweet = "Jose fed uncontrollably on " + champjson['name'] + ".\nK/D/A: " + str(kills) + "/" + str(deaths) + "/" + str(assists)
-                print(tweet)
-                api.update_status(status=tweet)
+            tweet = genTweet("Jose fed uncontrollably on ")
+            api.update_status(status=tweet)
         dumpPickle(matchTime)
 main()
